@@ -39,6 +39,7 @@ import org.clulab.wm.eidos.context.TimeStep
 import org.clulab.wm.eidos.document.attachments.DctDocumentAttachment
 import org.clulab.wm.eidos.document.attachments.LocationDocumentAttachment
 import org.clulab.wm.eidos.document.attachments.TitleDocumentAttachment
+import org.clulab.wm.eidos.document.attachments.GeoPhraseIDDocumentAttachment
 import org.clulab.wm.eidos.groundings.OntologyAliases
 import org.clulab.wm.eidos.groundings.OntologyGrounding
 import org.clulab.wm.eidos.mentions.CrossSentenceEventMention
@@ -171,6 +172,10 @@ class JLDDeserializer {
       case _ => Seq()
     }
     new IdAndTimex(timexId, TimEx(Interval(startOffset, endOffset), intervals, text))
+  }
+
+  def deserializeDocGeoloc(geoIdValue: Option[JValue]): Option[IdAndGeoPhraseId] = {
+    geoIdValue.map(deserializeGeoloc)
   }
 
   def deserializeGeoloc(geoIdValue: JValue): IdAndGeoPhraseId = {
@@ -358,6 +363,7 @@ class JLDDeserializer {
     val documentIdOpt = (documentValue \ "id").extractOpt[String]
     val textOpt = (documentValue \ "text").extractOpt[String]
     val locationOpt = (documentValue \ "location").extractOpt[String]
+    val geoPhraseIDOpt = deserializeDocGeoloc(nothingToNone((documentValue \ "docgeoloc").extractOpt[JValue]))
     val idAndDctOpt = deserializeDct(nothingToNone((documentValue \ JLDDCT.singular).extractOpt[JValue]))
     // Text is required here!  Can't otherwise make raw for sentences.
     val sentencesSpec = deserializeSentences(documentValue \ "sentences", textOpt)
@@ -377,6 +383,10 @@ class JLDDeserializer {
     locationOpt.foreach { location =>
       LocationDocumentAttachment.setLocation(document, location)
     }
+    geoPhraseIDOpt.map(_.value).foreach { geoPhraseID =>
+      GeoPhraseIDDocumentAttachment.setGeoPhraseID(document, geoPhraseID)
+    }
+
 
     val idAndDocument = new IdAndDocument(id, document)
     DocumentSpec(idAndDocument, idAndDctOpt, sentencesSpec)

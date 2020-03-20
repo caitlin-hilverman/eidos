@@ -22,8 +22,9 @@ class CluText(eidosSystem: EidosSystem, text: String, jValueOpt: Option[JValue])
   protected val metadata: Metadata = {
     val dctStringOpt: Option[String] = getDocumentCreationTime
     val titleOpt: Option[String] = getDocumentTitle
+    val geoPhraseStringOpt: Option[String] = getDocumentGeoPhraseID
 
-    Metadata(eidosSystem, dctStringOpt, titleOpt)
+    Metadata(eidosSystem, dctStringOpt, titleOpt, geoPhraseStringOpt)
   }
 
   override def getText: String = text
@@ -78,6 +79,16 @@ class CluText(eidosSystem: EidosSystem, text: String, jValueOpt: Option[JValue])
     }
     documentCreationTime.map(_ + ".")
   }
+
+  protected def getDocumentGeoPhraseID: Option[String] = {
+    val documentGeoPhraseID = jValueOpt.flatMap { json =>
+      val goodGeoPhraseID = CluText.getMetaValue(json, "document geolocation")
+
+      goodGeoPhraseID
+    }
+    documentGeoPhraseID
+  }
+
 }
 
 object CluText {

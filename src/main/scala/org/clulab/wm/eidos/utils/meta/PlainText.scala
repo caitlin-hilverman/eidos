@@ -35,7 +35,7 @@ class PlainText(text: String,
       }
     }
 
-    new Metadata(dctOpt, idOpt, titleOpt, locationOpt)
+    new Metadata(dctOpt, idOpt, titleOpt, locationOpt, None)
   }
 
   def getText: String = text

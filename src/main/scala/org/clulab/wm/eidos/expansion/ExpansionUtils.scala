@@ -1,8 +1,8 @@
 package org.clulab.wm.eidos.expansion
 
 import org.clulab.odin._
-import org.clulab.wm.eidos.attachments.{DCTime, Property, Time}
-import org.clulab.wm.eidos.document.attachments.DctDocumentAttachment
+import org.clulab.wm.eidos.attachments.{DCTime, Location, Property, Time}
+import org.clulab.wm.eidos.document.attachments.{DctDocumentAttachment, GeoPhraseIDDocumentAttachment, LocationDocumentAttachment}
 import org.clulab.wm.eidos.utils.MentionUtils
 
 object ExpansionUtils {
@@ -35,6 +35,17 @@ object ExpansionUtils {
     val dctOpt = DctDocumentAttachment.getDct(m.document)
     if (dctOpt.isDefined && m.attachments.filter(_.isInstanceOf[Time]).isEmpty) {
       m.withAttachment(DCTime(dctOpt.get))
+    }
+    else
+      m
+  }
+
+  // Add the document location attachment if there is no location attachment
+  // i.e., a backoff
+  def attachDocumentGeoPhraseID(m: Mention, state: State): Mention = {
+    val geoPhraseIDOpt = GeoPhraseIDDocumentAttachment.getGeoPhraseID(m.document)
+    if (geoPhraseIDOpt.isDefined && m.attachments.filter(_.isInstanceOf[Location]).isEmpty) {
+      m.withAttachment(Location(geoPhraseIDOpt.get))
     }
     else
       m

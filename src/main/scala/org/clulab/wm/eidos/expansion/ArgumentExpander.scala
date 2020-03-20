@@ -94,6 +94,7 @@ class ArgumentExpander(validArgs: Set[String], validLabels: Set[String], depende
         val attached = expandedArgs
           .map(ExpansionUtils.addSubsumedAttachments(_, state))
           .map(ExpansionUtils.attachDCT(_, state))
+          .map(ExpansionUtils.attachDocumentGeoPhraseID(_, state))
           .map(ExpansionUtils.addOverlappingAttachmentsTextBounds(_, state)) // todo: what does this do that the addSubsumed doesn't?
           .map(EntityHelper.trimEntityEdges)
         // Store

@@ -22,6 +22,7 @@ import org.clulab.wm.eidos.document.AnnotatedDocument.Corpus
 import org.clulab.wm.eidos.document.attachments.DctDocumentAttachment
 import org.clulab.wm.eidos.document.attachments.LocationDocumentAttachment
 import org.clulab.wm.eidos.document.attachments.TitleDocumentAttachment
+import org.clulab.wm.eidos.document.attachments.GeoPhraseIDDocumentAttachment
 import org.clulab.wm.eidos.groundings.{AdjectiveGrounder, AdjectiveGrounding, OntologyGrounding}
 import org.clulab.wm.eidos.mentions.EidosCrossSentenceEventMention
 import org.clulab.wm.eidos.mentions.{EidosCrossSentenceMention, EidosEventMention, EidosMention, EidosTextBoundMention}
@@ -993,6 +994,8 @@ class JLDDocument(serializer: JLDSerializer, annotatedDocument: AnnotatedDocumen
     val jldText = annotatedDocument.document.text.map(text => text)
     val dctOpt = DctDocumentAttachment.getDct(annotatedDocument.document)
     val jldDCT = dctOpt.map(dct => new JLDDCT(serializer, dct).toJObject)
+    val geoPhraseIDOpt = GeoPhraseIDDocumentAttachment.getGeoPhraseID(annotatedDocument.document)
+    val jlGeoPhraseID = geoPhraseIDOpt.map(geoPhraseID => new JLDGeoID(serializer, geoPhraseID).toJObject)
 
     TidyJObject(List(
       serializer.mkType(this),
@@ -1001,6 +1004,7 @@ class JLDDocument(serializer: JLDSerializer, annotatedDocument: AnnotatedDocumen
       "title" -> TitleDocumentAttachment.getTitle(annotatedDocument.document),
       "location" -> LocationDocumentAttachment.getLocation(annotatedDocument.document),
       JLDDCT.singular -> jldDCT,
+      "docgeoloc" -> jlGeoPhraseID,
       "text" -> jldText,
       JLDSentence.plural -> jldSentences
     ))
